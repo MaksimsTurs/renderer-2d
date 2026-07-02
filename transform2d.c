@@ -1,25 +1,31 @@
 #include "transform2d.h"
 
-void transform2d_apply(transform2d_t* transform, vec2u32_t* vertecies, i8_t length)
+transform2d_t transform2d_create(vec2i32_t *vertecies, i8_t length)
 {
-  u32_t x = 0;
-  u32_t y = 0;
+  transform2d_t transform = {
+    {0, 0},
+    {0, 0},
+    {1.0f, 1.0f},
+    0.0f
+  };
 
   for(i8_t index = 0; index < length; index++)
   {
-    x = (transform->basis.x.x * vertecies[index].x) +
-        (transform->basis.x.y * vertecies[index].y) +
-        transform->translation.x;
-    y = (transform->basis.y.x * vertecies[index].x) +
-        (transform->basis.y.y * vertecies[index].y) +
-        transform->translation.x;
-    vertecies[index].x = x;
-    vertecies[index].y = y;
+    transform.origin.x += vertecies[index].x;
+    transform.origin.y += vertecies[index].y;
   }
+
+  transform.origin.x /= length;
+  transform.origin.y /= length;
+
+  return transform;
 }
 
-void transform2d_scale(vec2f32_t *scale)
-{}
-
-void transform2d_rotate(f32_t radiants)
-{}
+mat3x3f32_t transform2d_to_mat3x3f32(transform2d_t* transform)
+{
+  return(mat3x3f32_t){
+    {cosf(transform->rotation) * transform->scale.x, -sinf(transform->rotation) * transform->scale.y, transform->translation.x},
+    {sinf(transform->rotation) * transform->scale.x,  cosf(transform->rotation) * transform->scale.y, transform->translation.y},
+    {1.0f,                                            1.0f,                                           1.0f}
+  };
+}

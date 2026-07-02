@@ -8,9 +8,17 @@ typedef struct {
 } vec2f32_t;
 
 typedef struct {
+  f32_t x, y, z;
+} vec3f32_t;
+
+typedef struct {
   u32_t x, y;
 } vec2u32_t;
 
-i32_t vec2u32_calc_determinant(vec2u32_t a, vec2u32_t b, vec2u32_t c);
+typedef struct {
+  i32_t x, y;
+} vec2i32_t;
+
+i32_t vec2i32_calc_determinant(vec2i32_t a, vec2i32_t b, vec2i32_t c);
 
 #endif
