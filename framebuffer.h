@@ -7,8 +7,8 @@
 #include "type.h"
 #include "vector.h"
 
-#define PUT_PIXEL(fram_buffer, x, y, color) do {\
-  (frame_buffer)->pixels[(y * (frame_buffer)->height + x)] = color;\
+#define PUT_PIXEL(frambuffer, x, y, color) do {\
+  (framebuffer)->pixels[(y * (framebuffer)->height + x)] = color;\
 } while(0)
 
 typedef struct {
@@ -17,8 +17,9 @@ typedef struct {
 } framebuffer_t;
 
 void framebuffer_clear(framebuffer_t* framebuffer);
-void framebuffer_draw_line(framebuffer_t* framebuffer, vec2u32_t vertecies[2]);
-void framebuffer_draw_triangle(framebuffer_t* framebuffer, vec2u32_t vertecies[3]);
-void framebuffer_draw_rectangle(framebuffer_t* framebuffer, vec2u32_t vertecies[6]);
+void framebuffer_draw_point(framebuffer_t* framebuffer, vec2i32_t point);
+void framebuffer_draw_line(framebuffer_t* framebuffer, vec2i32_t vertecies[2]);
+void framebuffer_draw_triangle(framebuffer_t* framebuffer, vec2i32_t vertecies[3]);
+void framebuffer_draw_rectangle(framebuffer_t* framebuffer, vec2i32_t vertecies[6]);
 
 #endif
