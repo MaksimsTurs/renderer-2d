@@ -14,13 +14,13 @@
 
 typedef struct {
   u32_t*  pixels;
-  u32_t   width, height;
+  i32_t   width, height;
 } framebuffer_t;
 
 void framebuffer_clear(framebuffer_t* framebuffer);
-void framebuffer_draw_point(framebuffer_t* framebuffer, vec2i32_t point);
-void framebuffer_draw_line(framebuffer_t* framebuffer, vec2i32_t vertecies[2]);
-void framebuffer_draw_triangle(framebuffer_t* framebuffer, vec2i32_t vertecies[3]);
-void framebuffer_draw_rectangle(framebuffer_t* framebuffer, vec2i32_t vertecies[6]);
+void framebuffer_draw_point(framebuffer_t* framebuffer, vec2f32_t point);
+void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2]);
+void framebuffer_draw_triangle(framebuffer_t* framebuffer, vec2f32_t vertecies[3]);
+void framebuffer_draw_rectangle(framebuffer_t* framebuffer, vec2f32_t vertecies[6]);
 
 #endif
