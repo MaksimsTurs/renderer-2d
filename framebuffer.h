@@ -6,6 +6,7 @@
 
 #include "type.h"
 #include "vector.h"
+#include "camera2d.h"
 
 #define PUT_PIXEL(frambuffer, x, y, color) do {\
   (framebuffer)->pixels[(y * (framebuffer)->height + x)] = color;\
