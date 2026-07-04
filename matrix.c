@@ -40,16 +40,22 @@ mat3x3f32_t mat3x3f32_multiply_mat3x3f32(mat3x3f32_t *a, mat3x3f32_t *b)
   };
 }
 
+// TODO This thing break the entire rendering, think about NDC (Normalized Device Coordinate). 
 mat3x3f32_t mat3x3f32_orthographic(f32_t left, f32_t right, f32_t top, f32_t bottom)
 {
-  f32_t cx = (left + right) / 2.0f;
-  f32_t cy = (top + bottom) / 2.0f;
-  f32_t sx = (right - left) / 2.0f;
-  f32_t sy = (bottom - top) / 2.0f;
+  // f32_t cx = (left + right) / 2.0f;
+  // f32_t cy = (top + bottom) / 2.0f;
+  // f32_t sx = (right - left) / 2.0f;
+  // f32_t sy = (bottom - top) / 2.0f;
+
+  f32_t cx = 0.0f;
+  f32_t cy = 0.0f;
+  f32_t sx = 1.0f;
+  f32_t sy = 1.0f;
 
   return(mat3x3f32_t){
-    { 1.0f,   0.0f, 0.0f },
-    { 0.0f, 1.0f,   0.0f },
+    { sx,   0.0f, -cx },
+    { 0.0f, sx,   -cy },
     { 0.0f, 0.0f, 1.0f }
   };
 }
