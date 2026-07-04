@@ -5,6 +5,7 @@
 
 #include "type.h"
 #include "vector.h"
+#include "utils.h"
 
 typedef struct {
   vec3f32_t x, y, z;

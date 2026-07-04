@@ -48,6 +48,11 @@ mat3x3f32_t mat3x3f32_orthographic(f32_t left, f32_t right, f32_t top, f32_t bot
   // f32_t sx = (right - left) / 2.0f;
   // f32_t sy = (bottom - top) / 2.0f;
 
+  UNUSED(left);
+  UNUSED(right);
+  UNUSED(top);
+  UNUSED(bottom);
+
   f32_t cx = 0.0f;
   f32_t cy = 0.0f;
   f32_t sx = 1.0f;
@@ -55,7 +60,7 @@ mat3x3f32_t mat3x3f32_orthographic(f32_t left, f32_t right, f32_t top, f32_t bot
 
   return(mat3x3f32_t){
     { sx,   0.0f, -cx },
-    { 0.0f, sx,   -cy },
+    { 0.0f, sy,   -cy },
     { 0.0f, 0.0f, 1.0f }
   };
 }
