@@ -19,6 +19,6 @@ typedef struct {
   i32_t x, y;
 } vec2i32_t;
 
-i32_t vec2i32_calc_determinant(vec2i32_t a, vec2i32_t b, vec2i32_t c);
+i32_t vec2i32_determinant(vec2i32_t a, vec2i32_t b, vec2i32_t c);
 
 #endif
