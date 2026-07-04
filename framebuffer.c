@@ -1,5 +1,19 @@
 #include "framebuffer.h"
-#include "type.h"
+
+bound_box_t framebuffer_get_bound_box(framebuffer_t* framebuffer, vec2f32_t *vertecies, i16_t length)
+{
+  bound_box_t bound_box = {vertecies[0].x, vertecies[0].y, vertecies[1].x, vertecies[1].y};
+
+  for(i16_t index = 0; index < length; index++)
+  {
+    bound_box.x = MAX(MIN(bound_box.x, vertecies[index].x), 0);
+    bound_box.y = MAX(MIN(bound_box.y, vertecies[index].y), 0);
+    bound_box.width = MIN(MAX(bound_box.width, vertecies[index].x), framebuffer->width);
+    bound_box.height = MIN(MAX(bound_box.height, vertecies[index].y), framebuffer->height);
+  }
+
+  return bound_box;
+}
 
 void framebuffer_clear(framebuffer_t* framebuffer)
 {
@@ -15,6 +29,8 @@ void framebuffer_draw_point(framebuffer_t *framebuffer, vec2f32_t point)
 }
 
 // TODO Fix rotation bug.
+// TODO Fix bound box calculation bug.
+// TODO Fix filling outside frame buffer (seg. fault) bug.
 void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
 {
   i32_t x = (i32_t)vertecies[0].x;
@@ -39,7 +55,7 @@ void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
 
   if(dy <= dx) {
     err = -dx;
-    
+
     while(x != (i32_t)vertecies[1].x) {
       PUT_PIXEL(frambuffer, x, y, 0xff0000ff);
       err += abs(b);
@@ -70,18 +86,20 @@ void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
 
 void framebuffer_draw_triangle(framebuffer_t* framebuffer, vec2f32_t vertecies[3])
 {
-  for(i32_t y = 0; y < framebuffer->height; y++)
+  bound_box_t bound_box = framebuffer_get_bound_box(framebuffer, vertecies, 3);
+
+  for(i32_t y = bound_box.y; y < bound_box.height; y++)
   {
-    for(i32_t x = 0; x < framebuffer->width; x++)
+    for(i32_t x = bound_box.x; x < bound_box.width; x++)
     {
       vec2i32_t p1 = {x,y};
       vec2i32_t p2 = {(i32_t)vertecies[0].x, (i32_t)vertecies[0].y};
       vec2i32_t p3 = {(i32_t)vertecies[1].x, (i32_t)vertecies[1].y};
       vec2i32_t p4 = {(i32_t)vertecies[2].x, (i32_t)vertecies[2].y};
 
-      i32_t a = vec2i32_calc_determinant(p2, p3, p1);
-      i32_t b = vec2i32_calc_determinant(p3, p4, p1);
-      i32_t c = vec2i32_calc_determinant(p4, p2, p1);
+      i32_t a = vec2i32_determinant(p2, p3, p1);
+      i32_t b = vec2i32_determinant(p3, p4, p1);
+      i32_t c = vec2i32_determinant(p4, p2, p1);
 
       if(a >= 0 && b >= 0 && c >= 0)
       {

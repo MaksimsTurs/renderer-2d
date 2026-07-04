@@ -7,6 +7,7 @@
 #include "type.h"
 #include "vector.h"
 #include "camera2d.h"
+#include "utils.h"
 
 #define PUT_PIXEL(frambuffer, x, y, color) do {\
   (framebuffer)->pixels[(y * (framebuffer)->height + x)] = color;\
@@ -17,10 +18,16 @@ typedef struct {
   i32_t   width, height;
 } framebuffer_t;
 
+typedef struct {
+  i32_t x, y, width, height;
+} bound_box_t;
+
 void framebuffer_clear(framebuffer_t* framebuffer);
 void framebuffer_draw_point(framebuffer_t* framebuffer, vec2f32_t point);
 void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2]);
 void framebuffer_draw_triangle(framebuffer_t* framebuffer, vec2f32_t vertecies[3]);
 void framebuffer_draw_rectangle(framebuffer_t* framebuffer, vec2f32_t vertecies[6]);
+
+bound_box_t framebuffer_get_bound_box(framebuffer_t* framebuffer, vec2f32_t* vertecies, i16_t length);
 
 #endif
