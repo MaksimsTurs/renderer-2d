@@ -1,6 +1,5 @@
 #include "vector.h"
 
-// TODO Maybe rename into triangle_edge_function or something like this
 i32_t vec2i32_determinant(vec2i32_t a, vec2i32_t b, vec2i32_t c)
 {
   const i32_t abx = b.x - a.x;
