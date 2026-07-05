@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+typedef unsigned char   bool_t;
 typedef char            i8_t;
 typedef unsigned char   u8_t;
 typedef short           i16_t;
