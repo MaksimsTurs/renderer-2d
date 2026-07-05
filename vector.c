@@ -1,4 +1,4 @@
-#include "vector.h"
+#include "include/vector.h"
 
 i32_t vec2i32_determinant(vec2i32_t a, vec2i32_t b, vec2i32_t c)
 {

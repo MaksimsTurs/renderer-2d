@@ -1,4 +1,4 @@
-#include "matrix.h"
+#include "include/matrix.h"
 
 void mat3x3f32_apply_to_shape(mat3x3f32_t *matrix, vec2f32_t origin, vec2f32_t* vertecies, vec2f32_t* buffer, i8_t length)
 {

@@ -1,4 +1,4 @@
-#include "camera2d.h"
+#include "include/camera2d.h"
 
 camera2d_t camera2d_create(f32_t left, f32_t right, f32_t top, f32_t bottom)
 {

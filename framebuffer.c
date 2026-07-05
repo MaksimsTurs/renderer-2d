@@ -1,4 +1,4 @@
-#include "framebuffer.h"
+#include "include/framebuffer.h"
 
 bound_box_t framebuffer_get_bound_box(framebuffer_t* framebuffer, vec2f32_t *vertecies, i16_t length)
 {

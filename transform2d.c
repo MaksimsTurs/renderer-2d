@@ -1,7 +1,4 @@
-#include "transform2d.h"
-#include "matrix.h"
-#include "type.h"
-#include <math.h>
+#include "include/transform2d.h"
 
 transform2d_t transform2d_create_from_vertecies(vec2f32_t *vertecies, i8_t length)
 {
