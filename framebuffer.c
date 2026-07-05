@@ -15,6 +15,21 @@ bound_box_t framebuffer_get_bound_box(framebuffer_t* framebuffer, vec2f32_t *ver
   return bound_box;
 }
 
+bound_box_t framebuffer_get_bound_circle(framebuffer_t* framebuffer, vec2f32_t vertecies[1], f32_t radius)
+{
+  bound_box_t bound_box = {0};
+
+  radius *= radius;
+
+  bound_box.x = MIN(MAX(vertecies[0].x - radius, 0), framebuffer->width);
+  bound_box.y = MIN(MAX(vertecies[0].y - radius, 0), framebuffer->height);
+
+  bound_box.width = MIN(MAX(vertecies[0].x + radius, 0), framebuffer->width);
+  bound_box.height = MIN(MAX(vertecies[0].y + radius, 0), framebuffer->height);
+
+  return bound_box;
+}
+
 bool_t framebuffer_is_point_outside(framebuffer_t *framebuffer, i32_t x, i32_t y)
 {
   return((x < 0 || x >= framebuffer->width) || (y < 0 || y >= framebuffer->height));
@@ -125,4 +140,27 @@ void framebuffer_draw_rectangle(framebuffer_t* framebuffer, vec2f32_t vertecies[
 
   framebuffer_draw_triangle(framebuffer, a);
   framebuffer_draw_triangle(framebuffer, b);
+}
+
+// TODO Do it better.
+void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertecies[1], f32_t radius)
+{
+  bound_box_t bound_box = framebuffer_get_bound_circle(framebuffer, vertecies, radius);
+  f32_t dx = 0.0f;
+  f32_t dy = 0.0f;
+
+  radius *= radius;
+
+  for(i32_t y = bound_box.y; y < bound_box.height; y++)
+  {
+    for(i32_t x = bound_box.x; x < bound_box.width; x++) {
+      dx = x - vertecies[0].x;
+      dy = y - vertecies[0].y;
+
+      if(sqrtf(dx*dx+dy*dy)<=radius)
+      {
+        PUT_PIXEL(frambuffer, x, y, 0xff0000ff);
+      }
+    }
+  }
 }
