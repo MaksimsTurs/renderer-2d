@@ -1,6 +1,6 @@
 #include "include/framebuffer.h"
 
-bound_box_t framebuffer_get_bound_box(framebuffer_t* framebuffer, vec2f32_t *vertecies, i16_t length)
+bound_box_t framebuffer_get_bound_box_from_vertecies(framebuffer_t* framebuffer, vec2f32_t *vertecies, i16_t length)
 {
   bound_box_t bound_box = {vertecies[0].x, vertecies[0].y, vertecies[1].x, vertecies[1].y};
 
@@ -15,17 +15,17 @@ bound_box_t framebuffer_get_bound_box(framebuffer_t* framebuffer, vec2f32_t *ver
   return bound_box;
 }
 
-bound_box_t framebuffer_get_bound_circle(framebuffer_t* framebuffer, vec2f32_t vertecies[1], f32_t radius)
+bound_box_t framebuffer_get_bound_box_from_radius(framebuffer_t* framebuffer, vec2f32_t mid_point, f32_t radius)
 {
   bound_box_t bound_box = {0};
 
   radius *= radius;
 
-  bound_box.x = MIN(MAX(vertecies[0].x - radius, 0), framebuffer->w);
-  bound_box.y = MIN(MAX(vertecies[0].y - radius, 0), framebuffer->h);
+  bound_box.x = MIN(MAX(mid_point.x - radius, 0), framebuffer->w);
+  bound_box.y = MIN(MAX(mid_point.y - radius, 0), framebuffer->h);
 
-  bound_box.w = MIN(MAX(vertecies[0].x + radius, 0), framebuffer->w);
-  bound_box.h = MIN(MAX(vertecies[0].y + radius, 0), framebuffer->h);
+  bound_box.w = MIN(MAX(mid_point.x + radius, 0), framebuffer->w);
+  bound_box.h = MIN(MAX(mid_point.y + radius, 0), framebuffer->h);
 
   return bound_box;
 }
