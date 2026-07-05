@@ -13,6 +13,8 @@
   (framebuffer)->pixels[(y * (framebuffer)->h + x)] = color;\
 } while(0)
 
+#define IS_PIXEL_IN_FRAMEBUFFER(framebuffer, x, y) (((x >= 0) || (x < (framebuffer)->w)) || ((y >= 0) || (y <= (framebuffer)->h)))\
+
 typedef struct {
   u32_t*  pixels;
   i32_t   w, h;
@@ -24,7 +26,6 @@ typedef struct {
 
 bound_box_t framebuffer_get_bound_box_from_vertecies(framebuffer_t* framebuffer, vec2f32_t* vertecies, i16_t length);
 bound_box_t framebuffer_get_bound_box_from_radius(framebuffer_t* framebuffer, vec2f32_t mid_point, f32_t radius);
-bool_t      framebuffer_is_point_outside(framebuffer_t* framebuffer, i32_t x, i32_t y);
 
 void framebuffer_clear(framebuffer_t* framebuffer);
 void framebuffer_draw_point(framebuffer_t* framebuffer, vec2f32_t point);

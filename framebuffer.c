@@ -30,11 +30,6 @@ bound_box_t framebuffer_get_bound_box_from_radius(framebuffer_t* framebuffer, ve
   return bound_box;
 }
 
-bool_t framebuffer_is_point_outside(framebuffer_t *framebuffer, i32_t x, i32_t y)
-{
-  return((x < 0 || x >= framebuffer->w) || (y < 0 || y >= framebuffer->h));
-}
-
 void framebuffer_clear(framebuffer_t* framebuffer)
 {
   for(i32_t i = 0; i < framebuffer->h * framebuffer->w; i++)
@@ -79,7 +74,7 @@ void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
     err = -dx;
 
     while(x != x_end) {
-      if(!framebuffer_is_point_outside(framebuffer, x, y))
+      if(IS_PIXEL_IN_FRAMEBUFFER(framebuffer, x, y))
         PUT_PIXEL(frambuffer, x, y, 0xff0000ff);
       err += b;
       
@@ -94,7 +89,7 @@ void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
     err = -dy;
 
     while(y != y_end) {
-      if(!framebuffer_is_point_outside(framebuffer, x, y))
+      if(IS_PIXEL_IN_FRAMEBUFFER(framebuffer, x, y))
         PUT_PIXEL(frambuffer, x, y, 0xff0000ff);
       err += a;
       
@@ -110,7 +105,7 @@ void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
 
 void framebuffer_draw_triangle(framebuffer_t* framebuffer, vec2f32_t vertecies[3])
 {
-  bound_box_t bound_box = framebuffer_get_bound_box(framebuffer, vertecies, 3);
+  bound_box_t bound_box = framebuffer_get_bound_box_from_vertecies(framebuffer, vertecies, 3);
 
   for(i32_t y = bound_box.y; y < bound_box.h; y++)
   {
@@ -145,7 +140,7 @@ void framebuffer_draw_rectangle(framebuffer_t* framebuffer, vec2f32_t vertecies[
 // TODO Do it better.
 void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertecies[1], f32_t radius)
 {
-  bound_box_t bound_box = framebuffer_get_bound_circle(framebuffer, vertecies, radius);
+  bound_box_t bound_box = framebuffer_get_bound_box_from_radius(framebuffer, vertecies[0], radius);
   f32_t dx = 0.0f;
   f32_t dy = 0.0f;
 
