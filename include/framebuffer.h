@@ -10,7 +10,7 @@
 #include "utils.h"
 
 #define PUT_PIXEL(frambuffer, x, y, color) do {\
-  (framebuffer)->pixels[(y * (framebuffer)->height + x)] = color;\
+  (framebuffer)->pixels[(y * (framebuffer)->h + x)] = color;\
 } while(0)
 
 typedef struct {
@@ -19,11 +19,11 @@ typedef struct {
 } framebuffer_t;
 
 typedef struct {
-  i32_t x, y, width, height;
+  i32_t x, y, w, h;
 } bound_box_t;
 
 bound_box_t framebuffer_get_bound_box(framebuffer_t* framebuffer, vec2f32_t* vertecies, i16_t length);
-bound_box_t framebuffer_get_bound_circle(framebuffer_t* framebuffer, vec2f32_t vertecies[1], f32_t radius);
+bound_box_t framebuffer_get_bound_circle(framebuffer_t* framebuffer, vec2f32_t mid_point, f32_t radius);
 bool_t      framebuffer_is_point_outside(framebuffer_t* framebuffer, i32_t x, i32_t y);
 
 void framebuffer_clear(framebuffer_t* framebuffer);

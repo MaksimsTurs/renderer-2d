@@ -8,8 +8,8 @@ bound_box_t framebuffer_get_bound_box(framebuffer_t* framebuffer, vec2f32_t *ver
   {
     bound_box.x = MAX(MIN(bound_box.x, vertecies[index].x), 0);
     bound_box.y = MAX(MIN(bound_box.y, vertecies[index].y), 0);
-    bound_box.width = MAX(MIN(MAX(bound_box.width, vertecies[index].x), framebuffer->width), 0);
-    bound_box.height = MAX(MIN(MAX(bound_box.height, vertecies[index].y), framebuffer->height), 0);
+    bound_box.w = MAX(MIN(MAX(bound_box.w, vertecies[index].x), framebuffer->w), 0);
+    bound_box.h = MAX(MIN(MAX(bound_box.h, vertecies[index].y), framebuffer->h), 0);
   }
 
   return bound_box;
@@ -21,23 +21,23 @@ bound_box_t framebuffer_get_bound_circle(framebuffer_t* framebuffer, vec2f32_t v
 
   radius *= radius;
 
-  bound_box.x = MIN(MAX(vertecies[0].x - radius, 0), framebuffer->width);
-  bound_box.y = MIN(MAX(vertecies[0].y - radius, 0), framebuffer->height);
+  bound_box.x = MIN(MAX(vertecies[0].x - radius, 0), framebuffer->w);
+  bound_box.y = MIN(MAX(vertecies[0].y - radius, 0), framebuffer->h);
 
-  bound_box.width = MIN(MAX(vertecies[0].x + radius, 0), framebuffer->width);
-  bound_box.height = MIN(MAX(vertecies[0].y + radius, 0), framebuffer->height);
+  bound_box.w = MIN(MAX(vertecies[0].x + radius, 0), framebuffer->w);
+  bound_box.h = MIN(MAX(vertecies[0].y + radius, 0), framebuffer->h);
 
   return bound_box;
 }
 
 bool_t framebuffer_is_point_outside(framebuffer_t *framebuffer, i32_t x, i32_t y)
 {
-  return((x < 0 || x >= framebuffer->width) || (y < 0 || y >= framebuffer->height));
+  return((x < 0 || x >= framebuffer->w) || (y < 0 || y >= framebuffer->h));
 }
 
 void framebuffer_clear(framebuffer_t* framebuffer)
 {
-  for(i32_t i = 0; i < framebuffer->height * framebuffer->width; i++)
+  for(i32_t i = 0; i < framebuffer->h * framebuffer->w; i++)
   {
     framebuffer->pixels[i] = 0x000000ff;
   }
@@ -112,9 +112,9 @@ void framebuffer_draw_triangle(framebuffer_t* framebuffer, vec2f32_t vertecies[3
 {
   bound_box_t bound_box = framebuffer_get_bound_box(framebuffer, vertecies, 3);
 
-  for(i32_t y = bound_box.y; y < bound_box.height; y++)
+  for(i32_t y = bound_box.y; y < bound_box.h; y++)
   {
-    for(i32_t x = bound_box.x; x < bound_box.width; x++)
+    for(i32_t x = bound_box.x; x < bound_box.w; x++)
     {
       vec2i32_t p1 = {x,y};
       vec2i32_t p2 = {(i32_t)vertecies[0].x, (i32_t)vertecies[0].y};
@@ -151,9 +151,9 @@ void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertecies[1],
 
   radius *= radius;
 
-  for(i32_t y = bound_box.y; y < bound_box.height; y++)
+  for(i32_t y = bound_box.y; y < bound_box.h; y++)
   {
-    for(i32_t x = bound_box.x; x < bound_box.width; x++) {
+    for(i32_t x = bound_box.x; x < bound_box.w; x++) {
       dx = x - vertecies[0].x;
       dy = y - vertecies[0].y;
 
