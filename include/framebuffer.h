@@ -15,7 +15,7 @@
 
 typedef struct {
   u32_t*  pixels;
-  i32_t   width, height;
+  i32_t   w, h;
 } framebuffer_t;
 
 typedef struct {
