@@ -1,49 +1,50 @@
 #include "include/framebuffer.h"
 
-bound_box_t framebuffer_get_bound_box_from_vertecies(framebuffer_t* framebuffer, vec2f32_t *vertecies, i16_t length)
-{
-  bound_box_t bound_box = {vertecies[0].x, vertecies[0].y, vertecies[1].x, vertecies[1].y};
+// TODO Fill multiply pixels in framebuffer_clear.
+// TODO Use better algorithm for drawing circles.
+// TODO Maybe change the vertecies ordering.
+// TODO Better Alpha Blending (depth buffer/z index/layout?).
 
-  for(i16_t index = 0; index < length; index++)
+void framebuffer_create(framebuffer_t *framebuffer, i32_t width, i32_t height)
+{
+  framebuffer->w = width;
+  framebuffer->h = height;
+  framebuffer->pixels = (u32_t*)malloc(width * height * sizeof(u32_t));
+}
+
+void framebuffer_destroy(framebuffer_t *framebuffer)
+{
+  framebuffer->w = 0;
+  framebuffer->h = 0;
+  free(framebuffer->pixels);
+  framebuffer->pixels = NULL;
+}
+
+void framebuffer_resize(framebuffer_t *framebuffer, i32_t width, i32_t height)
+{
+  framebuffer->w = width;
+  framebuffer->h = height;
+  free(framebuffer->pixels);
+  framebuffer->pixels = NULL;
+  framebuffer->pixels = (u32_t*)malloc(width * height * sizeof(u32_t));
+}
+
+void framebuffer_clear(framebuffer_t* framebuffer, u32_t color)
+{
+  const i32_t count = framebuffer->w * framebuffer->h;
+
+  for(i32_t i = 0; i < count; i++)
   {
-    bound_box.x = MAX(MIN(bound_box.x, vertecies[index].x), 0);
-    bound_box.y = MAX(MIN(bound_box.y, vertecies[index].y), 0);
-    bound_box.w = MAX(MIN(MAX(bound_box.w, vertecies[index].x), framebuffer->w), 0);
-    bound_box.h = MAX(MIN(MAX(bound_box.h, vertecies[index].y), framebuffer->h), 0);
-  }
-
-  return bound_box;
-}
-
-bound_box_t framebuffer_get_bound_box_from_radius(framebuffer_t* framebuffer, vec2f32_t mid_point, f32_t radius)
-{
-  bound_box_t bound_box = {0};
-
-  radius *= radius;
-
-  bound_box.x = MIN(MAX(mid_point.x - radius, 0), framebuffer->w);
-  bound_box.y = MIN(MAX(mid_point.y - radius, 0), framebuffer->h);
-
-  bound_box.w = MIN(MAX(mid_point.x + radius, 0), framebuffer->w);
-  bound_box.h = MIN(MAX(mid_point.y + radius, 0), framebuffer->h);
-
-  return bound_box;
-}
-
-void framebuffer_clear(framebuffer_t* framebuffer)
-{
-  for(i32_t i = 0; i < framebuffer->h * framebuffer->w; i++)
-  {
-    framebuffer->pixels[i] = 0x000000ff;
+    framebuffer->pixels[i] = color;
   }
 }
 
-void framebuffer_draw_point(framebuffer_t *framebuffer, vec2f32_t point)
+void framebuffer_draw_point(framebuffer_t *framebuffer, vec2f32_t point, u32_t color)
 {
-  PUT_PIXEL(framebuffer, (i32_t)point.x, (i32_t)point.y, 0xff0000ff);
+  PUT_PIXEL(framebuffer, (i32_t)point.x, (i32_t)point.y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, (i32_t)point.x, (i32_t)point.y), color));
 }
 
-void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
+void framebuffer_draw_line(framebuffer_t* framebuffer, const vec2f32_t vertecies[2], u32_t color)
 {
   i32_t x = (i32_t)vertecies[0].x;
   i32_t y = (i32_t)vertecies[0].y;
@@ -75,7 +76,9 @@ void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
 
     while(x != x_end) {
       if(IS_PIXEL_IN_FRAMEBUFFER(framebuffer, x, y))
-        PUT_PIXEL(frambuffer, x, y, 0xff0000ff);
+      {
+        PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
+      }
       err += b;
       
       if(err > 0) {
@@ -90,7 +93,9 @@ void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
 
     while(y != y_end) {
       if(IS_PIXEL_IN_FRAMEBUFFER(framebuffer, x, y))
-        PUT_PIXEL(frambuffer, x, y, 0xff0000ff);
+      {
+        PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
+      }
       err += a;
       
       if(err > 0) {
@@ -103,44 +108,50 @@ void framebuffer_draw_line(framebuffer_t* framebuffer, vec2f32_t vertecies[2])
   }
 }
 
-void framebuffer_draw_triangle(framebuffer_t* framebuffer, vec2f32_t vertecies[3])
+void framebuffer_draw_triangle(framebuffer_t* framebuffer, const vec2f32_t vertecies[3], u32_t color)
 {
-  bound_box_t bound_box = framebuffer_get_bound_box_from_vertecies(framebuffer, vertecies, 3);
+  const bound_box_t bound_box = framebuffer_get_bound_box_from_vertecies(framebuffer, vertecies, 3);
+ 
+  vec2i32_t p1 = {0};
+  vec2i32_t p2 = {(i32_t)vertecies[0].x, (i32_t)vertecies[0].y};
+  vec2i32_t p3 = {(i32_t)vertecies[1].x, (i32_t)vertecies[1].y};
+  vec2i32_t p4 = {(i32_t)vertecies[2].x, (i32_t)vertecies[2].y};
+
+  i32_t a = 0;
+  i32_t b = 0;
+  i32_t c = 0;
 
   for(i32_t y = bound_box.y; y < bound_box.h; y++)
   {
     for(i32_t x = bound_box.x; x < bound_box.w; x++)
     {
-      vec2i32_t p1 = {x,y};
-      vec2i32_t p2 = {(i32_t)vertecies[0].x, (i32_t)vertecies[0].y};
-      vec2i32_t p3 = {(i32_t)vertecies[1].x, (i32_t)vertecies[1].y};
-      vec2i32_t p4 = {(i32_t)vertecies[2].x, (i32_t)vertecies[2].y};
+      p1 = (vec2i32_t){x,y};
 
-      i32_t a = vec2i32_determinant(p2, p3, p1);
-      i32_t b = vec2i32_determinant(p3, p4, p1);
-      i32_t c = vec2i32_determinant(p4, p2, p1);
+      a = triangle_edge(p2, p3, p1);
+      b = triangle_edge(p3, p4, p1);
+      c = triangle_edge(p4, p2, p1);
 
       if(a >= 0 && b >= 0 && c >= 0)
       {
-        PUT_PIXEL(fram_buffer, x, y, 0xff0000ff);
+        PUT_PIXEL(fram_buffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
       }
     }
   }
 }
 
-void framebuffer_draw_rectangle(framebuffer_t* framebuffer, vec2f32_t vertecies[6])
+void framebuffer_draw_rectangle(framebuffer_t* framebuffer, const vec2f32_t vertecies[6], u32_t color)
 {
-  vec2f32_t a[3] = {vertecies[0], vertecies[1], vertecies[2]};
-  vec2f32_t b[3] = {vertecies[3], vertecies[4], vertecies[5]};
+  const vec2f32_t a[3] = {vertecies[0], vertecies[1], vertecies[2]};
+  const vec2f32_t b[3] = {vertecies[3], vertecies[4], vertecies[5]};
 
-  framebuffer_draw_triangle(framebuffer, a);
-  framebuffer_draw_triangle(framebuffer, b);
+  framebuffer_draw_triangle(framebuffer, a, color);
+  framebuffer_draw_triangle(framebuffer, b, color);
 }
 
-// TODO Do it better.
-void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertecies[1], f32_t radius)
+void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertex, f32_t radius, u32_t color)
 {
-  bound_box_t bound_box = framebuffer_get_bound_box_from_radius(framebuffer, vertecies[0], radius);
+  const bound_box_t bound_box = framebuffer_get_bound_box_from_radius(framebuffer, vertex, radius);
+  
   f32_t dx = 0.0f;
   f32_t dy = 0.0f;
 
@@ -149,13 +160,131 @@ void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertecies[1],
   for(i32_t y = bound_box.y; y < bound_box.h; y++)
   {
     for(i32_t x = bound_box.x; x < bound_box.w; x++) {
-      dx = x - vertecies[0].x;
-      dy = y - vertecies[0].y;
+      dx = x - vertex.x;
+      dy = y - vertex.y;
 
-      if(sqrtf(dx*dx+dy*dy)<=radius)
+      if(sqrtf(dx * dx + dy * dy) <= radius)
       {
-        PUT_PIXEL(frambuffer, x, y, 0xff0000ff);
+        PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
       }
     }
   }
+}
+
+void framebuffer_draw_image_triangle(framebuffer_t* framebuffer, vec2i32_t src_size, const u32_t* buffer, const vec2f32_t uv[3], const vec2f32_t vertecies[3])
+{
+  const bound_box_t bound_box = framebuffer_get_bound_box_from_vertecies(framebuffer, vertecies, 3);
+
+  u8_t cr = 0;
+  u8_t cg = 0;
+  u8_t cb = 0;
+  u8_t ca = 0;
+
+  vec2i32_t p1 = {0};
+  vec2i32_t p2 = {(i32_t)vertecies[0].x, (i32_t)vertecies[0].y};
+  vec2i32_t p3 = {(i32_t)vertecies[1].x, (i32_t)vertecies[1].y};
+  vec2i32_t p4 = {(i32_t)vertecies[2].x, (i32_t)vertecies[2].y};
+
+  i32_t a = 0;
+  i32_t b = 0;
+  i32_t c = 0;
+  i32_t area = triangle_edge(p2, p3, p4);
+  f32_t w0 = 0.0f;
+  f32_t w1 = 0.0f;
+  f32_t w2 = 0.0f;
+  f32_t u = 0.0f;
+  f32_t v = 0.0f;
+
+  for(i32_t y = bound_box.y; y < bound_box.h; y++)
+  {
+    for(i32_t x = bound_box.x; x < bound_box.w; x++)
+    {
+      p1 = (vec2i32_t){x,y};
+
+      a = triangle_edge(p2, p3, p1);
+      b = triangle_edge(p3, p4, p1);
+      c = triangle_edge(p4, p2, p1);
+
+      if(a >= 0 && b >= 0 && c >= 0)
+      {
+        w0 = (f32_t)a / area;
+        w1 = (f32_t)b / area;
+        w2 = (f32_t)c / area;
+        
+        u = w0 * uv[0].x + w1 * uv[1].x + w2 * uv[2].x;
+        v = w0 * uv[0].y + w1 * uv[1].y + w2 * uv[2].y;
+
+        cr = PIXEL_GET_R(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
+        cg = PIXEL_GET_G(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
+        cb = PIXEL_GET_B(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
+        ca = PIXEL_GET_A(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
+        PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), PIXEL_PACK_RGBA(ca, cb, cg, cr)));
+      }
+    }
+  }
+}
+
+void framebuffer_draw_image(framebuffer_t* framebuffer, vec2i32_t src_size, const u32_t* buffer, const vec2f32_t vertecies[6])
+{  
+  const vec2f32_t t1[3] = {vertecies[0], vertecies[1], vertecies[2]};
+  const vec2f32_t t2[3] = {vertecies[3], vertecies[4], vertecies[5]};
+  static const vec2f32_t uv1[3] = {{1.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f}};
+  static const vec2f32_t uv2[3] = {{0.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}};
+
+  framebuffer_draw_image_triangle(framebuffer, src_size, buffer, uv1, t1);
+  framebuffer_draw_image_triangle(framebuffer, src_size, buffer, uv2, t2);
+}
+
+u32_t framebuffer_alpha_blending(u32_t pixel_color, u32_t new_color)
+{
+  const f32_t pr = (f32_t)PIXEL_GET_R(pixel_color) / 255;
+  const f32_t pg = (f32_t)PIXEL_GET_G(pixel_color) / 255;
+  const f32_t pb = (f32_t)PIXEL_GET_B(pixel_color) / 255;
+  const f32_t pa = (f32_t)PIXEL_GET_A(pixel_color) / 255;
+  const f32_t nr = (f32_t)PIXEL_GET_R(new_color) / 255;
+  const f32_t ng = (f32_t)PIXEL_GET_G(new_color) / 255;
+  const f32_t nb = (f32_t)PIXEL_GET_B(new_color) / 255;
+  const f32_t na = (f32_t)PIXEL_GET_A(new_color) / 255;
+
+  if(na == 1.0f)
+  {
+    return new_color;
+  }
+
+  return PIXEL_PACK_RGBA(
+    (i8_t)((pa * pr + (1.0f - pa) * pa * na * nr) * 255), 
+    (i8_t)((pa * pg + (1.0f - pa) * pa * na * ng) * 255), 
+    (i8_t)((pa * pb + (1.0f - pa) * pa * na * nb) * 255),
+    (i8_t)((pa + na) * 255)
+  );
+}
+
+bound_box_t framebuffer_get_bound_box_from_vertecies(const framebuffer_t* framebuffer, const vec2f32_t *vertecies, i16_t length)
+{
+  bound_box_t bound_box = {vertecies[0].x, vertecies[0].y, vertecies[1].x, vertecies[1].y};
+
+  for(i16_t index = 0; index < length; index++)
+  {
+    bound_box.x = MAX(MIN(bound_box.x, vertecies[index].x), 0);
+    bound_box.y = MAX(MIN(bound_box.y, vertecies[index].y), 0);
+    bound_box.w = MAX(MIN(MAX(bound_box.w, vertecies[index].x), framebuffer->w), 0);
+    bound_box.h = MAX(MIN(MAX(bound_box.h, vertecies[index].y), framebuffer->h), 0);
+  }
+
+  return bound_box;
+}
+
+bound_box_t framebuffer_get_bound_box_from_radius(const framebuffer_t* framebuffer, vec2f32_t mid_point, f32_t radius)
+{
+  bound_box_t bound_box = {0};
+
+  radius *= radius;
+
+  bound_box.x = MIN(MAX(mid_point.x - radius, 0), framebuffer->w);
+  bound_box.y = MIN(MAX(mid_point.y - radius, 0), framebuffer->h);
+
+  bound_box.w = MIN(MAX(mid_point.x + radius, 0), framebuffer->w);
+  bound_box.h = MIN(MAX(mid_point.y + radius, 0), framebuffer->h);
+
+  return bound_box;
 }
