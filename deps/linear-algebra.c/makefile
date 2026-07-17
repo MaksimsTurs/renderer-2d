@@ -8,19 +8,19 @@ mkdirs:
 	mkdir -p libs
 	mkdir -p objs
 
-libvector:
+libvector: mkdrs
 	$(CCOMPILER) $(CWARNS) $(COPT) vector.c -c
 	mv vector.o objs/vector.o
 	ar rsc libvector.a objs/vector.o
 	mv libvector.a libs/libvector.a
 
-libmatrix:
+libmatrix: mkdirs
 	$(CCOMPILER) $(CWARNS) $(COPT) matrix.c -c
 	mv matrix.o objs/matrix.o
 	ar rsc libmatrix.a objs/matrix.o
 	mv libmatrix.a libs/libmatrix.a
 
-libtransform:
+libtransform: mkdirs
 	$(CCOMPILER) $(CWARNS) $(COPT) transform.c -c
 	mv transform.o objs/transform.o
 	$(CCOMPILER) $(CWARNS) $(COPT) vector.c -c

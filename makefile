@@ -8,12 +8,12 @@ COPT_FLAGS		:= -O2
 LIBS					:= -lm -l:libvector.a
 
 all: mkdirs makedeps
-	$(CCOMPILER) $(CWARN_FLAGS) $(CEXTRA_FLAGS) $(COPT_FLAGS) -I$(INCLUDE_PATH) framebuffer.c -c $(LIBS)
+	$(CCOMPILER) $(CWARN_FLAGS) $(CEXTRA_FLAGS) $(COPT_FLAGS) framebuffer.c -c $(LIBS)
 	mv framebuffer.o objs/framebuffer.o
-	$(CCOMPILER) $(CWARN_FLAGS) $(CEXTRA_FLAGS) $(COPT_FLAGS) -I$(INCLUDE_PATH) utils.c -c $(LIBS)
+	$(CCOMPILER) $(CWARN_FLAGS) $(CEXTRA_FLAGS) $(COPT_FLAGS) utils.c -c $(LIBS)
 	mv utils.o objs/utils.o
-	ar rsc framebuffer.a objs/framebuffer.o objs/utils.o
-	mv framebuffer.a libs/framebuffer.a
+	ar rsc libframebuffer.a objs/framebuffer.o objs/utils.o
+	mv libframebuffer.a libs/libframebuffer.a
 
 mkdirs:
 	mkdir -p libs
