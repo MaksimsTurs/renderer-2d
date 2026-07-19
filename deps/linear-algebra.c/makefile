@@ -4,11 +4,7 @@ COPT			:= -std=c99 -march=native -mtune=native -O2 -fno-math-errno -ftrapping-ma
 
 all: mkdirs libvector libmatrix libtransform
 
-mkdirs:
-	mkdir -p libs
-	mkdir -p objs
-
-libvector: mkdrs
+libvector: mkdirs
 	$(CCOMPILER) $(CWARNS) $(COPT) vector.c -c
 	mv vector.o objs/vector.o
 	ar rsc libvector.a objs/vector.o
@@ -27,3 +23,7 @@ libtransform: mkdirs
 	mv vector.o objs/vector.o
 	ar rsc libtransform.a objs/transform.o objs/vector.o
 	mv libtransform.a libs/libtransform.a
+
+mkdirs:
+	mkdir -p libs
+	mkdir -p objs
