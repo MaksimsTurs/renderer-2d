@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "type.h"
-#include "vector.h"
+#include "vendors/type.h"
+#include "vendors/vector.h"
+
 #include "utils.h"
 
 #define PIXEL_GET_R(pixel) ((pixel >> 24) & 0xff)
@@ -42,8 +43,4 @@ void framebuffer_draw_image(framebuffer_t* framebuffer, vec2i32_t src_size, cons
 void framebuffer_draw_image_triangle(framebuffer_t* framebuffer, vec2i32_t src_size, const u32_t* buffer, const vec2f32_t uv[3], const vec2f32_t vertecies[3]);
 
 u32_t framebuffer_alpha_blending(u32_t pixel_color, u32_t new_color);
-
-bound_box_t framebuffer_get_bound_box_from_vertecies(const framebuffer_t* framebuffer, const vec2f32_t* vertecies, i16_t length);
-bound_box_t framebuffer_get_bound_box_from_radius(const framebuffer_t* framebuffer, vec2f32_t mid_point, f32_t radius);
-
 #endif
