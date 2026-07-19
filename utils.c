@@ -1,4 +1,4 @@
-#include "include/utils.h"
+#include "includes/utils.h"
 
 i32_t triangle_edge(vec2i32_t a, vec2i32_t b, vec2i32_t c)
 {
