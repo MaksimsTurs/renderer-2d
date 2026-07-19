@@ -1,24 +1,23 @@
-LIB_PATH			:= libs
+LIB_PATH := -L./libs
+INCLUDE_PATH := -I./
 
-CCOMPILER			:= gcc
-CWARN_FLAGS		:= -Wall -Wextra -Wswitch-default -Wshadow -Wundef
-CEXTRA_FLAGS	:= -L$(LIB_PATH) -std=c99 -mtune=native -march=native
-COPT_FLAGS		:= -O2
-
-LIBS					:= -lm -l:libvector.a
+CC := gcc
+CWARN	:= -Wall -Wextra -Wshadow -Wundef
+COPT := -O2 -mtune=native -march=native
+CFLAGS := $(CWARN) $(COPT) -std=c99 $(LIB_PATH) $(INCLUDE_PATH)
 
 all: mkdirs makedeps
-	$(CCOMPILER) $(CWARN_FLAGS) $(CEXTRA_FLAGS) $(COPT_FLAGS) framebuffer.c -c $(LIBS)
+	$(CC) $(CFLAGS) framebuffer.c -c -lm -l:libvector.a
 	mv framebuffer.o objs/framebuffer.o
-	$(CCOMPILER) $(CWARN_FLAGS) $(CEXTRA_FLAGS) $(COPT_FLAGS) utils.c -c $(LIBS)
+	$(CC) $(CFLAGS) utils.c -c
 	mv utils.o objs/utils.o
 	ar rsc libframebuffer.a objs/framebuffer.o objs/utils.o
 	mv libframebuffer.a libs/libframebuffer.a
 
+makedeps:
+	cd deps/linear-algebra.c && make libvector
+	cp deps/linear-algebra.c/libs/libvector.a libs/libvector.a
+
 mkdirs:
 	mkdir -p libs
 	mkdir -p objs
-
-makedeps:
-	cd deps/linear-algebra.c && make libvector
-	cp deps/linear-algebra.c/libs/* libs
