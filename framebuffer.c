@@ -1,4 +1,5 @@
-#include "includes/framebuffer.h"
+#include "framebuffer.h"
+#include <stdio.h>
 
 // TODO Fill multiply pixels in framebuffer_clear.
 // TODO Use better algorithm for drawing circles.
@@ -147,18 +148,18 @@ void framebuffer_draw_rectangle(framebuffer_t* framebuffer, const vec2f32_t vert
 
 void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertex, f32_t radius, u32_t color)
 {
-  f32_t dx = 0.0f;
-  f32_t dy = 0.0f;
+  vec2f32_t d = {0.0f, 0.0f};
+  vec2f32_t p = {0.0f, 0.0f};
 
   radius *= radius;
 
   for(i32_t y = 0; y < framebuffer->h; y++)
   {
     for(i32_t x = 0; x < framebuffer->w; x++) {
-      dx = x - vertex.x;
-      dy = y - vertex.y;
+      p = (vec2f32_t){x, y};
+      d = vec2f32_sub(&p, &vertex);
 
-      if(sqrtf(dx * dx + dy * dy) <= radius)
+      if(vec2f32_length(&d) <= radius)
       {
         PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
       }
@@ -239,15 +240,15 @@ u32_t framebuffer_alpha_blending(u32_t pixel_color, u32_t new_color)
   const f32_t nb = (f32_t)PIXEL_GET_B(new_color) / 255;
   const f32_t na = (f32_t)PIXEL_GET_A(new_color) / 255;
 
-  if(na == 1.0f)
+  if(PIXEL_GET_A(new_color) == 255)
   {
     return new_color;
   }
 
   return PIXEL_PACK_RGBA(
-    (i8_t)((pa * pr + (1.0f - pa) * pa * na * nr) * 255), 
-    (i8_t)((pa * pg + (1.0f - pa) * pa * na * ng) * 255), 
-    (i8_t)((pa * pb + (1.0f - pa) * pa * na * nb) * 255),
-    (i8_t)((pa + na) * 255)
+    (u8_t)((((1.0f - na) * pr) + (na * nr)) * 255), 
+    (u8_t)((((1.0f - na) * pg) + (na * ng)) * 255), 
+    (u8_t)((((1.0f - na) * pb) + (na * nb)) * 255),
+    PIXEL_GET_A(new_color)
   );
 }

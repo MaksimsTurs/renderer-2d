@@ -4,16 +4,15 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "vendors/type.h"
-#include "vendors/vector.h"
-
+#include "type.h"
 #include "utils.h"
+#include "lac/vector.h"
 
-#define PIXEL_GET_R(pixel) ((pixel >> 24) & 0xff)
-#define PIXEL_GET_G(pixel) ((pixel >> 16) & 0xff)
-#define PIXEL_GET_B(pixel) ((pixel >> 8) & 0xff)
-#define PIXEL_GET_A(pixel) ((pixel >> 0) & 0xff)
-#define PIXEL_PACK_RGBA(r, g, b, a) ((r << 24) | (g << 16) | (b << 8) | (a << 0))
+#define PIXEL_GET_R(pixel) ((pixel >> 16) & 0xff)
+#define PIXEL_GET_G(pixel) ((pixel >> 8) & 0xff)
+#define PIXEL_GET_B(pixel) ((pixel >> 0) & 0xff)
+#define PIXEL_GET_A(pixel) ((pixel >> 24) & 0xff)
+#define PIXEL_PACK_RGBA(r, g, b, a) ((r << 16) | (g << 8) | (b << 0) | (a << 24))
 #define GET_PIXEL(framebuffer, x, y) (framebuffer)->pixels[(y * (framebuffer)->w + x)] 
 #define PUT_PIXEL(frambuffer, x, y, color) do {\
   (framebuffer)->pixels[(y * (framebuffer)->w + x)] = color;\
