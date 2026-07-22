@@ -157,7 +157,7 @@ void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertex, f32_t
 
       if(vec2f32_length(&d) <= radius)
       {
-        PUT_PIXEL(frambuffer, p.x, p.y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, p.x, p.y), color));
+        PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
       }
     }
   }
