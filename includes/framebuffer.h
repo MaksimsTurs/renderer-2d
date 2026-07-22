@@ -24,10 +24,6 @@ typedef struct {
   i32_t w, h;
 } framebuffer_t;
 
-typedef struct {
-  i32_t x, y, w, h;
-} bound_box_t;
-
 void framebuffer_create(framebuffer_t* framebuffer, i32_t width, i32_t height);
 void framebuffer_destroy(framebuffer_t* framebuffer);
 void framebuffer_resize(framebuffer_t* framebuffer, i32_t width, i32_t height);
