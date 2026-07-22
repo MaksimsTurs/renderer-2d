@@ -46,64 +46,60 @@ void framebuffer_draw_point(framebuffer_t *framebuffer, vec2f32_t point, u32_t c
 
 void framebuffer_draw_line(framebuffer_t* framebuffer, const vec2f32_t vertecies[2], u32_t color)
 {
-  i32_t x = (i32_t)vertecies[0].x;
-  i32_t y = (i32_t)vertecies[0].y;
-  i32_t x_end = (i32_t)vertecies[1].x;
-  i32_t y_end = (i32_t)vertecies[1].y;
-  i32_t dx = x_end - x;
-  i32_t dy = y_end - y;
-  i32_t step_x = 1;
-  i32_t step_y = 1;
+  vec2i32_t p = {vertecies[0].x, vertecies[0].y};
+  vec2i32_t pe = {vertecies[1].x, vertecies[1].y};
+  vec2i32_t d = vec2i32_sub(&pe, &p);
+  vec2i32_t step = {1, 1};
   i32_t a = 0;
   i32_t b = 0;
   i32_t err = 0;
 
-  if(dx < 0) {
-    dx = -dx;
-    step_x = -1;
+  if(d.x < 0) {
+    d.x = -d.x;
+    step.x = -1;
   }
 
-  if(dy < 0) {
-    dy = -dy;
-    step_y = -1;
+  if(d.y < 0) {
+    d.y = -d.y;
+    step.y = -1;
   }
 
-  a = dx + dx;
-  b = dy + dy;
+  a = d.x + d.x;
+  b = d.y + d.y;
 
-  if(dy <= dx) {
-    err = -dx;
+  if(d.y <= d.x) {
+    err = -d.x;
 
-    while(x != x_end) {
-      if(IS_PIXEL_IN_FRAMEBUFFER(framebuffer, x, y))
+    while(p.x != pe.x) {
+      if(IS_PIXEL_IN_FRAMEBUFFER(framebuffer, p.x, p.y))
       {
-        PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
+        PUT_PIXEL(frambuffer, p.x, p.y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, p.x, p.y), color));
       }
       err += b;
       
       if(err > 0) {
-        y += step_y;
+        p.y += step.y;
         err -= a;
       }
 
-      x += step_x;
+      p.x += step.x;
     }
   } else {
-    err = -dy;
+    err = -d.y;
 
-    while(y != y_end) {
-      if(IS_PIXEL_IN_FRAMEBUFFER(framebuffer, x, y))
+    while(p.y != pe.y) {
+      if(IS_PIXEL_IN_FRAMEBUFFER(framebuffer, p.x, p.y))
       {
-        PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
+        PUT_PIXEL(frambuffer, p.x, p.y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, p.x, p.y), color));
       }
       err += a;
       
       if(err > 0) {
-        x += step_x;
+        p.x += step.x;
         err -= b;
       }
 
-      y += step_y;
+      p.y += step.y;
     }
   }
 }
@@ -131,7 +127,7 @@ void framebuffer_draw_triangle(framebuffer_t* framebuffer, const vec2f32_t verte
 
       if(a >= 0 && b >= 0 && c >= 0)
       {
-        PUT_PIXEL(framebuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
+        PUT_PIXEL(framebuffer, p1.x, p1.y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, p1.x, p1.y), color));
       }
     }
   }
@@ -161,7 +157,7 @@ void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertex, f32_t
 
       if(vec2f32_length(&d) <= radius)
       {
-        PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), color));
+        PUT_PIXEL(frambuffer, p.x, p.y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, p.x, p.y), color));
       }
     }
   }
@@ -212,7 +208,7 @@ void framebuffer_draw_image_triangle(framebuffer_t* framebuffer, vec2i32_t src_s
         cg = PIXEL_GET_G(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
         cb = PIXEL_GET_B(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
         ca = PIXEL_GET_A(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
-        PUT_PIXEL(frambuffer, x, y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, x, y), PIXEL_PACK_RGBA(ca, cb, cg, cr)));
+        PUT_PIXEL(frambuffer, p1.x, p1.y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, p1.x, p1.y), PIXEL_PACK_RGBA(ca, cb, cg, cr)));
       }
     }
   }
@@ -234,7 +230,6 @@ u32_t framebuffer_alpha_blending(u32_t pixel_color, u32_t new_color)
   const f32_t pr = (f32_t)PIXEL_GET_R(pixel_color) / 255;
   const f32_t pg = (f32_t)PIXEL_GET_G(pixel_color) / 255;
   const f32_t pb = (f32_t)PIXEL_GET_B(pixel_color) / 255;
-  const f32_t pa = (f32_t)PIXEL_GET_A(pixel_color) / 255;
   const f32_t nr = (f32_t)PIXEL_GET_R(new_color) / 255;
   const f32_t ng = (f32_t)PIXEL_GET_G(new_color) / 255;
   const f32_t nb = (f32_t)PIXEL_GET_B(new_color) / 255;
