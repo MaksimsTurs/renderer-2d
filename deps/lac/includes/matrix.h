@@ -1,5 +1,5 @@
-#ifndef H_LINEARALGEBRA_MATRIX
-#define H_LINEARALGEBRA_MATRIX
+#ifndef H_LAC_MATRIX
+#define H_LAC_MATRIX
 
 #include <math.h>
 

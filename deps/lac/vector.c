@@ -1,4 +1,4 @@
-#include "include/vector.h"
+#include "includes/vector.h"
 
 DEFINE_VEC2_FUNC(vec2i8_t,        vec2i8, i8_t);
 DEFINE_VEC2_FUNC(vec2u8_t,        vec2u8, u8_t);

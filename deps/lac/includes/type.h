@@ -2,7 +2,9 @@
 #define H_CTYPES
 
 #include <stdint.h>
+#include <float.h>
 
+typedef void            void_t;
 typedef unsigned char   bool_t;
 typedef char            i8_t;
 typedef unsigned char   u8_t;
@@ -14,5 +16,8 @@ typedef int64_t         i64_t;
 typedef uint64_t        u64_t;
 typedef float           f32_t;
 typedef double          f64_t;
+
+#define true  (bool_t)1
+#define false (bool_t)0
 
 #endif

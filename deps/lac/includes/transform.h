@@ -1,5 +1,5 @@
-#ifndef H_LINEARALGEBRA_TRANSFORM
-#define H_LINEARALGEBRA_TRANSFORM
+#ifndef H_LAC_TRANSFORM
+#define H_LAC_TRANSFORM
 
 #include <math.h>
 
@@ -10,6 +10,7 @@ typedef struct {
   vec2f32_t translation;
   vec2f32_t origin;
   vec2f32_t scale;
+  vec2f32_t skew;
   f32_t rotation;
 } transform2d_t;
 
