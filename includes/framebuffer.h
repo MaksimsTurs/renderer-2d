@@ -34,8 +34,8 @@ void framebuffer_draw_line(framebuffer_t* framebuffer, const vec2f32_t vertecies
 void framebuffer_draw_triangle(framebuffer_t* framebuffer, const vec2f32_t vertecies[3], u32_t color);
 void framebuffer_draw_rectangle(framebuffer_t* framebuffer, const vec2f32_t vertecies[6], u32_t color);
 void framebuffer_draw_circle(framebuffer_t* framebuffer, vec2f32_t vertex, f32_t radius, u32_t color);
-void framebuffer_draw_image(framebuffer_t* framebuffer, vec2i32_t src_size, const u32_t* buffer, const vec2f32_t vertecies[6]);
-void framebuffer_draw_image_triangle(framebuffer_t* framebuffer, vec2i32_t src_size, const u32_t* buffer, const vec2f32_t uv[3], const vec2f32_t vertecies[3]);
+void framebuffer_draw_image(framebuffer_t* framebuffer, vec2i32_t dimension, vec2i32_t src_size, vec2i32_t src_offset, const u32_t* buffer, const vec2f32_t vertecies[6]);
+void framebuffer_draw_image_triangle(framebuffer_t* framebuffer, vec2i32_t dimension, vec2i32_t src_size, vec2i32_t src_offset, const u32_t* buffer, const vec2f32_t uv[3], const vec2f32_t vertecies[3]);
 
 u32_t framebuffer_alpha_blending(u32_t pixel_color, u32_t new_color);
 #endif

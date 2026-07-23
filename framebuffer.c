@@ -1,9 +1,8 @@
 #include "framebuffer.h"
-#include <stdio.h>
 
-// TODO Fill multiply pixels in framebuffer_clear.
-// TODO Use better algorithm for drawing circles.
-// TODO Better Alpha Blending (depth buffer/z index/layout?).
+// TODO framebuffer_clear:       fill multiple pixels in single iteration.
+// TODO framebuffer_draw_circle: get rid of vec2f32_length(&d) call.
+// TODO framebuffer_resize:      copy the prev pixels into the new buffer?
 
 void framebuffer_create(framebuffer_t *framebuffer, i32_t width, i32_t height)
 {
@@ -163,17 +162,18 @@ void framebuffer_draw_circle(framebuffer_t *framebuffer, vec2f32_t vertex, f32_t
   }
 }
 
-void framebuffer_draw_image_triangle(framebuffer_t* framebuffer, vec2i32_t src_size, const u32_t* buffer, const vec2f32_t uv[3], const vec2f32_t vertecies[3])
+void framebuffer_draw_image_triangle(framebuffer_t* framebuffer, vec2i32_t dimension, vec2i32_t src_size, vec2i32_t src_offset, const u32_t* buffer, const vec2f32_t uv[3], const vec2f32_t vertecies[3])
 {
-  u8_t cr = 0;
-  u8_t cg = 0;
-  u8_t cb = 0;
-  u8_t ca = 0;
-
+  vec2i32_t pt = {0};
   vec2i32_t p1 = {0};
   vec2i32_t p2 = {(i32_t)vertecies[0].x, (i32_t)vertecies[0].y};
   vec2i32_t p3 = {(i32_t)vertecies[1].x, (i32_t)vertecies[1].y};
   vec2i32_t p4 = {(i32_t)vertecies[2].x, (i32_t)vertecies[2].y};
+
+  u8_t cr = 0;
+  u8_t cg = 0;
+  u8_t cb = 0;
+  u8_t ca = 0;
 
   i32_t a = 0;
   i32_t b = 0;
@@ -204,25 +204,31 @@ void framebuffer_draw_image_triangle(framebuffer_t* framebuffer, vec2i32_t src_s
         u = w0 * uv[0].x + w1 * uv[1].x + w2 * uv[2].x;
         v = w0 * uv[0].y + w1 * uv[1].y + w2 * uv[2].y;
 
-        cr = PIXEL_GET_R(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
-        cg = PIXEL_GET_G(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
-        cb = PIXEL_GET_B(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
-        ca = PIXEL_GET_A(buffer[(i32_t)(v * (src_size.y - 1)) * src_size.x + (i32_t)(u * (src_size.x - 1))]);
+        pt.x = (i32_t)(u * (src_size.x - 1));
+        pt.y = (i32_t)(v * (src_size.y - 1));
+
+        pt.x = MIN(pt.x + src_offset.x, dimension.x);
+        pt.y = MIN(pt.y + src_offset.y, dimension.y);
+
+        cr = PIXEL_GET_R(buffer[pt.y * dimension.x + pt.x]);
+        cg = PIXEL_GET_G(buffer[pt.y * dimension.x + pt.x]);
+        cb = PIXEL_GET_B(buffer[pt.y * dimension.x + pt.x]);
+        ca = PIXEL_GET_A(buffer[pt.y * dimension.x + pt.x]);
         PUT_PIXEL(frambuffer, p1.x, p1.y, framebuffer_alpha_blending(GET_PIXEL(framebuffer, p1.x, p1.y), PIXEL_PACK_RGBA(ca, cb, cg, cr)));
       }
     }
   }
 }
 
-void framebuffer_draw_image(framebuffer_t* framebuffer, vec2i32_t src_size, const u32_t* buffer, const vec2f32_t vertecies[6])
+void framebuffer_draw_image(framebuffer_t* framebuffer, vec2i32_t dimension, vec2i32_t src_size, vec2i32_t src_offset, const u32_t* buffer, const vec2f32_t vertecies[6])
 {  
   const vec2f32_t t1[3] = {vertecies[0], vertecies[1], vertecies[2]};
   const vec2f32_t t2[3] = {vertecies[3], vertecies[4], vertecies[5]};
   static const vec2f32_t uv1[3] = {{0.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}};
-  static const vec2f32_t uv2[3] = {{0.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}}; 
+  static const vec2f32_t uv2[3] = {{0.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}};
 
-  framebuffer_draw_image_triangle(framebuffer, src_size, buffer, uv1, t1);
-  framebuffer_draw_image_triangle(framebuffer, src_size, buffer, uv2, t2);
+  framebuffer_draw_image_triangle(framebuffer, dimension, src_size, src_offset, buffer, uv1, t1);
+  framebuffer_draw_image_triangle(framebuffer, dimension, src_size, src_offset, buffer, uv2, t2);
 }
 
 u32_t framebuffer_alpha_blending(u32_t pixel_color, u32_t new_color)
